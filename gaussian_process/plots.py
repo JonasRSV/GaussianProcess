@@ -5,38 +5,36 @@ import gaussian_process as gp
 import matplotlib.pyplot as plt
 import seaborn as sb
 
-fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
+fig, (ax1, ax2) = plt.subplots(2, 1)
 
 linear_process = gp.gaussian_process(mean=means.zero, kernel=kernels.linear)
 
 se_process = gp.gaussian_process(
-    mean=means.zero, kernel=kernels.squared_exponential(2, 100))
-
-bm_process = gp.gaussian_process(
-    mean=means.zero, kernel=kernels.brownian_motion(1))
-
-periodic_process = gp.gaussian_process(
-    mean=means.zero, kernel=kernels.periodic(1, 5))
-
+    mean=means.zero, kernel=kernels.squared_exponential(4, 2))
 
 ax1.set_title("linear process")
 ax2.set_title("squared exponential process")
-ax3.set_title("brownian motion process")
-ax4.set_title("periodic process")
 
+x_domain = np.arange(-5, 5, 2)
+y_domain = np.sin(x_domain)
 
-x_domain = np.arange(0, 1, 0.005)
+linear_process.set(x_domain, y_domain)
+se_process.set(x_domain, y_domain)
 
-linear_process.set(x_domain)
-se_process.set(x_domain)
-bm_process.set(x_domain)
-periodic_process.set(x_domain)
+predict = np.arange(-5, 5, 0.1)
+pred_y = np.sin(predict)
 
-for _ in range(5):
-    sb.lineplot(x=x_domain, y=linear_process.sample(), ax=ax1)
-    sb.lineplot(x=x_domain, y=se_process.sample(), ax=ax2)
-    sb.lineplot(x=x_domain, y=bm_process.sample(), ax=ax3)
-    sb.lineplot(x=x_domain, y=periodic_process.sample(), ax=ax4)
+lpm, lpv = linear_process.posterior(predict)
+sem, sev = se_process.posterior(predict)
 
+sb.lineplot(predict, pred_y, ax=ax1)
+sb.lineplot(predict, pred_y, ax=ax2)
 
+sb.lineplot(predict, lpm, ax=ax1)
+sb.lineplot(predict, sem, ax=ax2)
+
+ax1.fill_between(predict, lpm - lpv, lpm + lpv, alpha=0.2, color="k")
+ax2.fill_between(predict, sem - sev, sem + sev, alpha=0.2, color="k")
+
+plt.tight_layout()
 plt.show()
