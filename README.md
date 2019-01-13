@@ -8,4 +8,4 @@ Gaussian Process
 #### Examples
 
 ![example processes](GaussianProcess.png)
-![Imgur](https://i.imgur.com/fgOJrtV.png)
+![Posteriors](Kernels.png)

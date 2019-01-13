@@ -20,8 +20,13 @@ def squared_exponential(variance, l):
 
 def brownian_motion(l):
     def kernel(x, y):
-        return l * min(x, y)
+        return l * min(np.minimum(x, y).reshape(-1)).reshape(-1)
 
+    return kernel
+
+def Lp(p):
+    def kernel(X, Y):
+        return np.float_power(np.sum(np.float_power(np.abs(X - Y), p)), 1 / p)
     return kernel
 
 
